@@ -1,0 +1,41 @@
+.TH MM 1 "2025-03-03" "1.0" "Music Manager"
+.SH NAME
+mm \- music management utility
+.SH SYNOPSIS
+.B mm
+[OPTION] <directory>
+.SH DESCRIPTION
+The mm utility is a music management tool that performs several operations on your music collection:
+
+.TP
+.B --compress <directory>
+Searches recursively for FLAC files in the specified directory, compresses them using 7z at maximum compression, and stores them in a \fIcompressed\fP folder while preserving the original directory structure.
+
+.TP
+.B --uncompress <directory>
+Searches for \fI.7z\fP archives in the given compressed folder, extracts them into an \fIuncompressed\fP folder (one directory level up), and preserves the directory structure.
+
+.TP
+.B --convert <directory>
+Searches for non-FLAC music files (e.g. MP3, AAC, OGG, WAV), converts them to FLAC using ffmpeg with maximum lossless compression, and saves them in a \fIconverted\fP folder while preserving structure.
+
+.TP
+.B --install
+Installs the mm script to the appropriate bin directory along with its manpage and bash completion file.
+
+.TP
+.B --uninstall
+Removes the installed mm script, manpage, and bash completion file.
+
+.TP
+.B --help
+Displays the help message.
+
+.TP
+.B --version
+Displays the version information.
+
+.SH AUTHOR
+Written by [Your Name].
+.SH LICENSE
+This software is released under the MIT License.

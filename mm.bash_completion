@@ -1,0 +1,12 @@
+# Bash completion for mm
+_mm_completions()
+{
+    local cur opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    opts="--compress --uncompress --convert --install --uninstall --help --version"
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    return 0
+}
+complete -F _mm_completions mm
+

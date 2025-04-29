@@ -1,41 +1,98 @@
-.TH MM 1 "2025-03-03" "1.0" "Music Manager"
+.TH mm 1 "2025-04-15" "Version 2.6" "Music Manager Manual"
 .SH NAME
-mm \- music management utility
+mm \- advanced media management tool
 .SH SYNOPSIS
 .B mm
-[OPTION] <directory>
+[OPERATION] [OPTIONS] <path>
 .SH DESCRIPTION
-The mm utility is a music management tool that performs several operations on your music collection:
-
+Music Manager is a Bash script designed to help you manage your media collection with minimal dependencies. It supports compressing, uncompressing, converting, scanning, and managing metadata of media files while preserving the original directory structure.
+.SH OPERATIONS
+.IP "--compress <directory>"
+Recursively compresses all supported media files (MP3, WAV, AAC, FLAC, OGG, OPUS, MP4, mov) in the specified directory. Compressed files are stored in a subdirectory named "compressed". An optional flag, 
+.B --package,
+can be used to bundle all compressed files into a single container archive.
+.IP "--uncompress <path>"
+Recursively extracts all .7z archives (or unpacks a packaged archive) from the specified path into an "uncompressed" folder, preserving the original directory structure.
+.IP "--convert <file|directory>"
+Converts media files to a target codec. By default, the target codec is opus.
 .TP
-.B --compress <directory>
-Searches recursively for FLAC files in the specified directory, compresses them using 7z at maximum compression, and stores them in a \fIcompressed\fP folder while preserving the original directory structure.
-
+.B --to <codec>
+Specifies the target codec.
 .TP
-.B --uncompress <directory>
-Searches for \fI.7z\fP archives in the given compressed folder, extracts them into an \fIuncompressed\fP folder (one directory level up), and preserves the directory structure.
-
+.B --keep
+Retains the original files by placing converted files in a new folder (e.g. "converted_opus") that mirrors the original directory structure.
 .TP
-.B --convert <directory>
-Searches for non-FLAC music files (e.g. MP3, AAC, OGG, WAV), converts them to FLAC using ffmpeg with maximum lossless compression, and saves them in a \fIconverted\fP folder while preserving structure.
-
+.B --replace
+Replaces the original files with the converted files (only if no data loss is expected).
 .TP
-.B --install
-Installs the mm script to the appropriate bin directory along with its manpage and bash completion file.
-
+.B --quiet
+Suppresses detailed debug output during conversion.
 .TP
-.B --uninstall
-Removes the installed mm script, manpage, and bash completion file.
-
+.B --metadata <mode>
+Controls metadata handling. Modes are:
+.IP "keep (default)"
+Copy all metadata tags.
+.IP "drop"
+Remove all metadata.
+.IP "drop:tag,tag..."
+Remove only the specified tags.
+Note: The older --from flag has been removed.
+.IP "--scan <file|directory>"
+Recursively scans media files. For each file, ffprobe extracts detailed metadata including container, codec, sample rate, bitrate, duration, and filesize. An expected filesize is computed and compared with
+the actual filesize (with a 1.5× threshold). The file is then classified as:
 .TP
-.B --help
-Displays the help message.
-
+.I Normal 
+(if the filesize is within the expected threshold; displayed in green).
 .TP
-.B --version
-Displays the version information.
-
+.I Weird 
+(if the filesize exceeds the threshold; displayed in yellow/orange).
+.TP
+.I Corrupted 
+(if the file is not validated by ffprobe; displayed in red).
+The scan results are both displayed on screen (with ANSI colors, if supported) and logged to a timestamped report file.
+.IP "--metadata-manage <path>"
+Allows management of metadata for media files.
+.TP
+.B --add "key=value,key2=value2,..."
+Adds or updates specified metadata tags.
+.TP
+.B --remove "tag,tag,..."
+Removes the specified metadata tags.
+.IP "--install"
+Installs the mm script, manpage, and bash completion into the appropriate system or local directories.
+.IP "--uninstall"
+Removes the installed script, manpage, and bash completion file.
+.IP "--help"
+Displays this help message.
+.IP "--version"
+Displays version information.
+.SH EXAMPLES
+.IP "Compress media files:"
+.EX
+mm --compress ~/Music
+.EE
+.IP "Convert media files to opus, keeping originals:"
+.EX
+mm --convert ~/Music --to opus --keep
+.EE
+.IP "Scan media files for anomalies:"
+.EX
+mm --scan ~/Music
+.EE
+.IP "Manage metadata (remove specified tags):"
+.EX
+mm --metadata-manage ~/Music --remove tag1,tag2
+.EE
 .SH AUTHOR
 Written by [Your Name].
-.SH LICENSE
-This software is released under the MIT License.
+.SH REPORTING BUGS
+Report bugs to <your.email@example.com>.
+.SH COPYRIGHT
+Copyright © 2025 [Your Name].  
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+.PP
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+.SH SEE ALSO
+bash(1), 7z(1), ffmpeg(1), ffprobe(1)
+

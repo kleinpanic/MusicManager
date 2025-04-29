@@ -1,12 +1,65 @@
-# Bash completion for mm
-_mm_completions()
-{
-    local cur opts
-    COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    opts="--compress --uncompress --convert --install --uninstall --help --version"
-    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+#!/usr/bin/env bash
+# Bash completion for Music Manager (mm)
+
+_mm() {
+    local cur prev words cword
+    _init_completion || return
+
+    # Main operations
+    local ops="--compress --uncompress --convert --scan --metadata-manage --install --uninstall --help --version"
+
+    # If only the first word is present, complete main operations
+    if [ $cword -eq 1 ]; then
+        COMPREPLY=( $(compgen -W "$ops" -- "$cur") )
+        return 0
+    fi
+
+    # Retrieve the first argument (operation)
+    local op="${words[1]}"
+    
+    case "$op" in
+        --compress)
+            # For compress, expect a directory path argument
+            COMPREPLY=( $(compgen -d -- "$cur") )
+            ;;
+        --uncompress)
+            # For uncompress, file or directory names (can be files)
+            COMPREPLY=( $(compgen -f -- "$cur") )
+            ;;
+        --convert)
+            # For convert operation, support suboptions and file/dir completion.
+            local convert_opts="--to --metadata --keep --replace --quiet"
+            # If current argument starts with --, suggest suboptions.
+            if [[ "$cur" == --* ]]; then
+                COMPREPLY=( $(compgen -W "$convert_opts" -- "$cur") )
+            else
+                # Otherwise, complete with file paths.
+                COMPREPLY=( $(compgen -f -- "$cur") )
+            fi
+            ;;
+        --scan)
+            # For scan, expect file or directory names.
+            COMPREPLY=( $(compgen -f -- "$cur") )
+            ;;
+        --metadata-manage)
+            # For metadata-manage, support --add and --remove as suboptions.
+            local meta_opts="--add --remove"
+            if [[ "$cur" == --* ]]; then
+                COMPREPLY=( $(compgen -W "$meta_opts" -- "$cur") )
+            else
+                COMPREPLY=( $(compgen -f -- "$cur") )
+            fi
+            ;;
+        --install|--uninstall|--help|--version)
+            # No further completion needed.
+            ;;
+        *)
+            # Fallback to main ops completion.
+            COMPREPLY=( $(compgen -W "$ops" -- "$cur") )
+            ;;
+    esac
     return 0
 }
-complete -F _mm_completions mm
+
+complete -F _mm mm
 
